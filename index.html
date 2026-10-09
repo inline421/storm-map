@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html{color-scheme:light dark}body{margin:0}</style></head><body><title>Storm Track Map</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html{color-scheme:light dark}body{margin:0}</style></head><body><title>Storm Track Map</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&display=swap">
 <style>
 :root{--bg:#EDF1F4;--card:#fff;--ink:#0F1B26;--ink2:#46576A;--mute:#7A8896;--line:#D5DDE4;--sea:#CFE3F1;--land:#F4F1E8;--storm:#C0392B;--ok:#1B7F54;--wd:#B7650C;--chip:#E3EAF0;--sel:#0F1B26;
@@ -77,7 +77,7 @@ td.hl{background:var(--chip);font-weight:600}
 <div class="main">
  <div>
   <div class="mapw"><svg id="svg" viewBox="0 0 1000 850" role="img" aria-label="Map of Isaias storm track and game locations"></svg>
-   <div class="legend"><b>Impact 1-10</b><span class="scale" id="scale"></span><span>Dot number + color = <b>live</b> impact at the slider time (hourly rain/wind forecast, 3-model avg); pulsing red ring = storm wind field over the game</span><span>Solid ring = our play · dashed = no play</span><span><span class="tag t-top">Most impacted</span> top 3</span><span><span class="tag t-peak">Storm peaking here</span> game inside the wind field</span></div>
+   <div class="legend"><b>Impact 1-10</b><span class="scale" id="scale"></span><span>Dot number + color = <b>live</b> impact at the slider time (hourly rain/wind forecast, 3-model avg); pulsing red ring = storm wind field over the game</span><span>Solid ring = our play · dashed = no play</span><span><span class="tag t-top">Most impacted</span> top 3</span><span><span class="tag t-peak">Storm peaking here</span> game inside the wind field with gusts 35+ mph during the game</span></div>
   </div>
  </div>
  <div class="side">
@@ -156,7 +156,8 @@ const FLT=[['all','All path games'],['plays','Our plays'],['none','No play'],['t
 const fb=document.getElementById('flt');
 FLT.forEach(([k,l])=>{const b=document.createElement('button');b.className='chip';b.textContent=l;b.setAttribute('aria-pressed',k===filter);b.onclick=()=>{filter=k;[...fb.children].forEach((c,i)=>c.setAttribute('aria-pressed',FLT[i][0]===k));apply()};fb.appendChild(b)});
 const vis=g=>filter==='all'||(filter==='plays'&&g.status!=='none')||(filter==='none'&&g.status==='none')||(filter==='top'&&g.top);
-function tags(g){let s='';if(g.status==='play')s+='<span class="tag t-play">Play</span> ';else if(g.status==='cond')s+='<span class="tag t-cond">Conditional play</span> ';else s+='<span class="tag t-none">No play</span> ';if(g.top)s+='<span class="tag t-top">Most impacted #'+g.top+'</span> ';if(g.peak)s+='<span class="tag t-peak">Storm peaking here</span> ';return s}
+function peakHere(g){const a=HW[g.id];if(!a)return false;const K=Date.parse(g.kick),i0=Math.floor((K-HW0)/3600e3);let mx=0;for(let i=i0;i<=i0+3;i++){const v=a.g[Math.max(0,Math.min(a.g.length-1,i))];if(v>mx)mx=v}const S=stormDist(g,K+1.5*3600e3);return S.d<=S.ts&&mx>=35}
+function tags(g){let s='';if(g.status==='play')s+='<span class="tag t-play">Play</span> ';else if(g.status==='cond')s+='<span class="tag t-cond">Conditional play</span> ';else s+='<span class="tag t-none">No play</span> ';if(g.top)s+='<span class="tag t-top">Most impacted #'+g.top+'</span> ';if(peakHere(g))s+='<span class="tag t-peak">Storm peaking here</span> ';return s}
 function apply(){const ul=document.getElementById('list');ul.innerHTML='';
  GAMES.forEach(g=>{dots[g.id].grp.style.display=vis(g)?'':'none'});
  [...GAMES].filter(vis).sort((a,b)=>b.score-a.score).forEach(g=>{const li=document.createElement('li');li.dataset.id=g.id;
