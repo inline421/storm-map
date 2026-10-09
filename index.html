@@ -133,19 +133,19 @@ function updateStorm(t){const p=posAt(t);cTS.setAttribute('cx',X(p.lo));cTS.setA
  document.getElementById('tl').textContent=fmt(t)+(Math.abs(t-NOW)<1800e3?' (now)':'');if(typeof updateLive==='function'&&typeof sel!=='undefined')updateLive(t);}
 
 function hr(g,i){const a=HW[g.id];if(!a)return null;i=Math.max(0,Math.min(a.p.length-1,i));return [a.p[i],a.w[i],a.g[i]]}
-function liveAt(g,t){const x=(t-HW0)/3600e3,i=Math.floor(x),f=x-i,a=hr(g,i),b=hr(g,i+1);if(!a)return null;
+function liveAt(g,t){const K=Date.parse(g.kick);if(t<K)return {off:'pre',K};if(t>K+3.5*3600e3)return {off:'post',K};const x=(t-HW0)/3600e3,i=Math.floor(x),f=x-i,a=hr(g,i),b=hr(g,i+1);if(!a)return null;
  const m=k=>a[k]+(b[k]-a[k])*f;const p=m(0),w=m(1),gu=m(2);
  const S0=stormDist(g,t);let fl=0,gf=gu;if(S0.d<=S0.ts){const core=1-S0.d/S0.ts;const sus=39+core*Math.max(0,S0.kt*1.151*0.5-39+10);fl=sus*1.3;if(fl>gu){gf=fl}else fl=0}
  const rs=Math.min(p/0.125,1),ws=Math.min(Math.max(gf-18,0)/26,1);return {p,w,gu:gf,fl:!!fl,mg:gu,sc:Math.max(1,Math.min(10,Math.round(1+9*(0.4*rs+0.6*ws))))}}
 function stormDist(g,t){const p=posAt(t);const dx=(p.lo-g.lon)*Math.cos(g.lat*Math.PI/180)*69.1,dy=(p.la-g.lat)*69.1;return {d:Math.hypot(dx,dy),ts:p.ts,kt:p.kt}}
 let curT=0;
 function updateLive(t){curT=t;
- GAMES.forEach(g=>{const L=liveAt(g,t);if(!L)return;const S=stormDist(g,t);const ins=S.d<=S.ts;const dd=dots[g.id];
+ GAMES.forEach(g=>{const L=liveAt(g,t);if(!L)return;const dd=dots[g.id];if(L.off){dd.c.setAttribute('fill','var(--mute)');dd.s.textContent='–';dd.pu.setAttribute('opacity',0);dd.lv.textContent=L.off==='pre'?'kicks '+fmt(L.K).replace(' ET',''):'game over';const li0=document.querySelector('#list li[data-id="'+g.id+'"] .live');if(li0)li0.innerHTML=liveHtml(g,t);return}const S=stormDist(g,t);const ins=S.d<=S.ts;
   dd.c.setAttribute('fill',colv(L.sc));dd.s.textContent=L.sc;dd.pu.setAttribute('opacity',ins?.9:0);
   dd.lv.textContent=L.p.toFixed(2)+'in · '+Math.round(L.w)+'/'+Math.round(L.gu)+' mph'+(ins?' · IN STORM':'');
   const li=document.querySelector('#list li[data-id="'+g.id+'"] .live');if(li)li.innerHTML=liveHtml(g,t)});
  const bx=document.getElementById('livebox');const g=GAMES.find(x=>x.id===sel);if(bx&&g)bx.innerHTML=liveHtml(g,t,true)}
-function liveHtml(g,t,big){const L=liveAt(g,t);if(!L)return '';const S=stormDist(g,t);const ins=S.d<=S.ts;
+function liveHtml(g,t,big){const L=liveAt(g,t);if(!L)return '';if(L.off)return '<b>'+fmt(t).replace(' ET','')+':</b> <span style="color:var(--mute)">'+(L.off==='pre'?'game not on yet · kicks '+fmt(L.K):'game over')+' · no live impact</span>';const S=stormDist(g,t);const ins=S.d<=S.ts;
  return '<b>'+fmt(t).replace(' ET','')+':</b> rain '+L.p.toFixed(2)+' in/hr · wind '+Math.round(L.w)+' / gust '+Math.round(L.gu)+' mph'+(L.fl?' <i>(NHC storm-field floor; models said '+Math.round(L.mg)+')</i>':'')+' · impact <b>'+L.sc+'</b>/10 · storm '+Math.round(S.d)+' mi away'+(ins?' · <span style="color:var(--storm);font-weight:700">inside wind field</span>':' (field ~'+Math.round(S.ts)+' mi)')}
 // filter
 const FLT=[['all','All path games'],['plays','Our plays'],['none','No play'],['top','Most impacted']];
