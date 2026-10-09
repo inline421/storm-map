@@ -57,6 +57,10 @@ td.hl{background:var(--chip);font-weight:600}
 .best{font:600 13px Barlow,sans-serif}
 .note{font-size:11.5px;color:var(--mute);margin-top:10px}
 .szwhy{margin-top:4px;padding:6px 9px;border-left:3px solid var(--wd);background:var(--chip);border-radius:4px;font-size:12.5px;color:var(--ink2)}
+.more{margin-top:5px;font:700 12px Barlow,sans-serif;color:var(--card);background:var(--ink);display:inline-block;border-radius:999px;padding:3px 10px}
+.list li{border-left:3px solid transparent}.list li:hover{border-left-color:var(--storm)}
+.tiphint{margin:0 0 10px;padding:8px 12px;border-radius:8px;background:var(--ink);color:var(--card);font:500 13.5px Barlow,sans-serif}
+.gdot{cursor:pointer}
 #dmod{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
 #dmod[hidden]{display:none!important}
 #dbk{position:absolute;inset:0;background:rgba(8,14,20,.6)}
@@ -66,6 +70,7 @@ td.hl{background:var(--chip);font-weight:600}
 </style>
 <h1>Isaias Storm Track Map</h1>
 <div class="sub" id="asof"></div>
+<div class="tiphint">👆 <b>Tap any game</b> on the map or in the list to open its full deep dive: weather hour by hour, our bet, why the size, and team matchup.</div>
 <div class="bar">
  <div class="chips" id="flt"></div>
  <div class="slider"><button class="btn" id="play" aria-label="Play storm animation">Play</button><input type="range" id="tm" min="0" max="100" step="1" aria-label="Storm time"><span class="tl" id="tl"></span></div>
@@ -157,7 +162,7 @@ function apply(){const ul=document.getElementById('list');ul.innerHTML='';
  GAMES.forEach(g=>{dots[g.id].grp.style.display=vis(g)?'':'none'});
  [...GAMES].filter(vis).sort((a,b)=>b.score-a.score).forEach(g=>{const li=document.createElement('li');li.dataset.id=g.id;
   const pc=g.bets.length?' <span class="pct">'+g.bets.map(b=>b.p+'%').join(' / ')+'</span>':'';
-  li.innerHTML='<div class="sc" style="background:'+colv(g.score)+'">'+g.score+'</div><div><div class="r1"><b>'+g.id.replace('@',' @ ')+'</b>'+pc+'</div><div class="r2">'+(g.bets.length?g.bets.map(b=>b.t).join(' · '):'No play')+'</div><div class="r2">'+g.kl+' · '+g.line+'</div><div class="r2">Rain '+g.rain.toFixed(2)+' in · gusts avg '+g.gm+' / peak '+g.pk+' mph</div><div class="r2 live" style="color:var(--ink)"></div><div>'+tags(g)+'</div></div>';
+  li.innerHTML='<div class="sc" style="background:'+colv(g.score)+'">'+g.score+'</div><div><div class="r1"><b>'+g.id.replace('@',' @ ')+'</b>'+pc+'</div><div class="r2">'+(g.bets.length?g.bets.map(b=>b.t).join(' · '):'No play')+'</div><div class="r2">'+g.kl+' · '+g.line+'</div><div class="r2">Rain '+g.rain.toFixed(2)+' in · gusts avg '+g.gm+' / peak '+g.pk+' mph</div><div class="r2 live" style="color:var(--ink)"></div><div>'+tags(g)+'</div><div class="more">Tap for the full deep dive ›</div></div>';
   li.onmouseenter=()=>show(g.id);li.onclick=()=>{pinned=g.id;show(g.id);openD()};ul.appendChild(li)});
  show(pinned&&GAMES.find(x=>x.id===pinned)&&vis(GAMES.find(x=>x.id===pinned))?pinned:([...GAMES].filter(vis).sort((a,b)=>b.score-a.score)[0]||{}).id)}
 function bars(a,k,mx,cls){return '<span class="bar1 '+(cls||'')+'" style="width:'+Math.max(1,Math.round(a/mx*60))+'px"></span>'}
